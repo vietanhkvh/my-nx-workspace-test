@@ -1,21 +1,25 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import styles from './ui-slider.module.scss';
 import classNames from 'classnames';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { count } from 'console';
+import React, { FC, useCallback, useEffect, useState } from 'react';
 
-/* eslint-disable-next-line */
-export interface UiSliderProps {}
-
-const ImageContainer = (props: any) => {
+interface ContentContainerProps {
+  loading: boolean;
+  offLoading: () => void;
+  onPause: () => void;
+  onPlay: () => void;
+  ContentComponent: () => any;
+}
+const ContentContainer: FC<ContentContainerProps> = (props) => {
   const {
     loading = true,
-    offLoading = (f: any) => f,
-    img = {},
+    offLoading = () => {},
+    ContentComponent = () => {},
     onPause = () => {},
+    onPlay = () => {},
   } = props;
 
-  const [styleAnimation, setStyleAnimation] = useState('appear');
+  const [styleAnimation, setStyleAnimation] = useState('transform-0');
   useEffect(() => {
     offLoading();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -26,37 +30,63 @@ const ImageContainer = (props: any) => {
   // }, [img]);
 
   useEffect(() => {
-    setStyleAnimation('appear');
+    setStyleAnimation('transorm-100');
     return () => {
-      setStyleAnimation('disappear');
+      setStyleAnimation('transform-0');
     };
-  });
+  }, []);
 
   return (
     <div
       className={classNames(
-        styles['image-container'],
+        styles['content-container'],
         styles['member-container'],
         styles[styleAnimation]
       )}
       onMouseEnter={onPause}
-      onMouseLeave={onPause}
+      onMouseLeave={onPlay}
     >
-      {loading ? 'loading' : <img src={img.url} alt="" />}
+      {loading ? 'loading' : <ContentComponent />}
     </div>
   );
 };
-const ButtonContainer = (props: any) => {
+interface ButtonContainerProps {
+  onChangePause: () => void;
+  paused: boolean;
+  onPre: () => void;
+  onNext: () => void;
+  arrContent: Array<any>;
+  current: number;
+  type: string;
+}
+const ButtonContainer: FC<ButtonContainerProps> = (props) => {
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   const {
-    onPause = () => {},
+    onChangePause = () => {},
     paused,
     onPre = () => {},
     onNext = () => {},
-    arrImg = [],
+    arrContent = [],
     current = 0,
+    type = '',
   } = props;
-
+  const dotDisplay = (type: string) =>
+    type === 'dot' ? (
+      arrContent.map((a: any) => (
+        <span
+          key={a.id}
+          className={classNames(
+            styles['dot-member'],
+            a.id === current + 1 ? styles['current'] : ''
+          )}
+        ></span>
+      ))
+    ) : (
+      <>
+        <span>{current + 1}</span>
+        <span>/{arrContent.length}</span>
+      </>
+    );
   return (
     <div
       className={classNames(
@@ -72,15 +102,7 @@ const ButtonContainer = (props: any) => {
           {'<'}
         </button>
         <div className={classNames(styles['dot-container'])}>
-          {arrImg.map((a: any) => (
-            <span
-              key={a.id}
-              className={classNames(
-                styles['dot-member'],
-                a.id === current + 1 ? styles['current'] : ''
-              )}
-            ></span>
-          ))}
+          {dotDisplay(type)}
         </div>
         <button
           className={classNames(styles['btn'], styles['btn-next'])}
@@ -90,7 +112,7 @@ const ButtonContainer = (props: any) => {
         </button>
         <button
           className={classNames(styles['btn'], styles['btn-pause'])}
-          onClick={onPause}
+          onClick={onChangePause}
         >
           {paused ? 'Play' : 'Stop'}
         </button>
@@ -98,62 +120,66 @@ const ButtonContainer = (props: any) => {
     </div>
   );
 };
+/* eslint-disable-next-line */
+export interface UiSliderProps {
+  arrContent: Array<any>;
+  timeChange: number;
+  type: 'dot' | 'number';
+}
 
-export function UiSlider(props: UiSliderProps) {
-  const [loading, setLoading] = useState<boolean>();
+const UiSlider: FC<UiSliderProps> = (props) => {
+  const { arrContent, timeChange, type } = props;
+  const [loading, setLoading] = useState<boolean>(true);
   const [paused, setPaused] = useState<boolean>(false);
   const [current, setCurrent] = useState<number>(0);
-  const speedChange = 3000;
-  const arrImg = [
-    {
-      id: 1,
-      url: 'https://cdn.shopify.com/s/files/1/0592/3369/7845/files/Halio_web.jpg?v=1660533507&width=1100',
-    },
-    {
-      id: 2,
-      url: 'https://cdn.shopify.com/s/files/1/0592/3369/7845/files/ONE_IN_A_MELON_BANNER.png?v=1660299007&width=1100',
-    },
-    {
-      id: 3,
-      url: 'https://cdn.shopify.com/s/files/1/0592/3369/7845/files/ORANGE_BANNER.jpg?v=1660529073&width=1100',
-    },
-  ];
+
   const offLoading = () => {
     setInterval(() => setLoading(false), 1000);
   };
-  const onPause = () => {
+  const onChangePause = useCallback(() => {
     setPaused(!paused);
-  };
+  }, [paused]);
+  const onPause = useCallback(() => {
+    setPaused(true);
+  }, []);
+  const onPlay = useCallback(() => {
+    setPaused(false);
+  }, []);
   const onNext = useCallback(() => {
-    current === arrImg.length - 1 ? setCurrent(0) : setCurrent(current + 1);
-  }, [arrImg.length, current]);
+    current === arrContent.length - 1 ? setCurrent(0) : setCurrent(current + 1);
+  }, [arrContent.length, current]);
   const onPre = () => {
-    current === 0 ? setCurrent(arrImg.length - 1) : setCurrent(current - 1);
+    current === 0 ? setCurrent(arrContent.length - 1) : setCurrent(current - 1);
   };
+
   useEffect(() => {
-    const sliderTimeOut = setInterval(onNext, speedChange);
+    const sliderTimeOut = setInterval(onNext, timeChange);
     if (paused) clearInterval(sliderTimeOut);
     return () => clearInterval(sliderTimeOut);
-  }, [onNext, paused, speedChange]);
+  }, [onNext, paused, timeChange]);
 
   return (
-    <div className={styles['slider-container']}>
-      <ImageContainer
-        loading={loading}
-        offLoading={offLoading}
-        img={arrImg[current]}
-        onPause={onPause}
-      />
-      <ButtonContainer
-        paused={paused}
-        onPause={onPause}
-        onNext={onNext}
-        onPre={onPre}
-        arrImg={arrImg}
-        current={current}
-      />
-    </div>
+    <React.StrictMode>
+      <div className={styles['slider-container']}>
+        <ContentContainer
+          loading={loading}
+          offLoading={offLoading}
+          ContentComponent={arrContent[current].content}
+          onPause={onPause}
+          onPlay={onPlay}
+        />
+        <ButtonContainer
+          paused={paused}
+          onChangePause={onChangePause}
+          onNext={onNext}
+          onPre={onPre}
+          arrContent={arrContent}
+          current={current}
+          type={type}
+        />
+      </div>
+    </React.StrictMode>
   );
-}
+};
 
 export default UiSlider;

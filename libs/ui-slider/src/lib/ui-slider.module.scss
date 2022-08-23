@@ -1,21 +1,33 @@
 .slider-container {
   scroll-snap-type: x mandatory;
   scroll-behavior: smooth;
+  transition: opacity ease-in-out 4s;
   .member-container {
     padding: 12px;
   }
-  .image-container {
+  .content-container {
     max-width: 100%;
     min-width: 100%;
     display: flex;
     justify-content: center;
-    transition: all 5s ease;
+    transition: opacity ease-in-out 4s;
     cursor: pointer;
+    &:hover {
+      -ms-transform: scale(1.05); /* IE 9 */
+      -webkit-transform: scale(1.05); /* Safari 3-8 */
+      transform: scale(1.05);
+    }
+    svg {
+      width: 100px;
+      height: 100px;
+      border: 1px solid #000000;
+      margin: 0 16px;
+    }
   }
-  .appear {
+  .transform-100 {
     transform: translateX(100px);
   }
-  .disappear {
+  .transform-0 {
     transform: translateX(0px);
   }
   .btn-container {
@@ -54,6 +66,7 @@
           cursor: pointer;
           border-radius: 50%;
           border: 1px solid #000000;
+          transform: ease 0.5s;
         }
         .current {
           background-color: #000000;
