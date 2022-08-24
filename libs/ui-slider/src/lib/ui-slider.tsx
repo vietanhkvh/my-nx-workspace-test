@@ -136,9 +136,9 @@ const UiSlider: FC<UiSliderProps> = (props) => {
   const offLoading = () => {
     setInterval(() => setLoading(false), 1000);
   };
-  const onChangePause = useCallback(() => {
-    setPaused(!paused);
-  }, [paused]);
+  const onChangePause = () => {
+    setPaused((prev) => !prev);
+  };
   const onPause = useCallback(() => {
     setPaused(true);
   }, []);
