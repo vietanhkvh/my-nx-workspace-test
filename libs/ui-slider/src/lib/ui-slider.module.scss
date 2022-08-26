@@ -1,7 +1,8 @@
 .slider-container {
   scroll-snap-type: x mandatory;
   scroll-behavior: smooth;
-  transition: opacity ease-in-out 4s;
+  // transition: opacity ease-in-out 4s;
+  transition: opacity 5s linear;
   .member-container {
     padding: 12px;
   }
@@ -10,7 +11,8 @@
     min-width: 100%;
     display: flex;
     justify-content: center;
-    transition: opacity ease-in-out 4s;
+    // transition: opacity ease-in-out 4s;
+    transition: opacity 5s linear;
     cursor: pointer;
     &:hover {
       -ms-transform: scale(1.05); /* IE 9 */
@@ -22,6 +24,9 @@
       height: 100px;
       border: 1px solid #000000;
       margin: 0 16px;
+    }
+    img {
+      transition: opacity 5s linear;
     }
   }
   .transform-100 {
