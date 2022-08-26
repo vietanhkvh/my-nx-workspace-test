@@ -2,7 +2,8 @@
 import styles from './app.module.scss';
 import NxWelcome from './nx-welcome';
 import UiSlider from 'libs/ui-slider/src/lib/ui-slider';
-
+import { UiIndexing, alphabet } from 'libs/ui-indexing/src/lib/ui-indexing';
+import { contentData } from 'libs/ui-indexing/src/lib/ui-indexing.stories';
 export function App() {
   return (
     <>
@@ -66,6 +67,9 @@ export function App() {
         timeChange={2000}
         type={'dot'}
       />
+      <div className={styles['container-indexing-homepage']}>
+        <UiIndexing arrLetter={alphabet} content={contentData} />
+      </div>
     </>
   );
 }
