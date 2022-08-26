@@ -1,7 +1,27 @@
-/*
- * Replace this with your own classes
- *
- * e.g.
- * .container {
- * }
-*/
+.popup-fixed-container {
+  position: fixed;
+  left: 0;
+  bottom: 5%;
+  background: #000000;
+  color: #ffffff;
+  display: flex;
+  justify-content: space-around;
+  flex-direction: row;
+  .member-container {
+    margin: 10px;
+    padding: 10px;
+  }
+  .btn-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    .btn-wrapper {
+    }
+  }
+}
+.popup-fixed-vertical {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+}
+.popup-fixed-horizontal {
+}
