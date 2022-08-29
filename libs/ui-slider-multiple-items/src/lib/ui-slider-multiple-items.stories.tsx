@@ -1,5 +1,5 @@
 import { ComponentStory, ComponentMeta } from '@storybook/react';
-import { UiSliderMultipleItems } from './ui-slider-multiple-items';
+import { UiSliderMultipleItems, arrContent } from './ui-slider-multiple-items';
 
 export default {
   component: UiSliderMultipleItems,
@@ -11,4 +11,7 @@ const Template: ComponentStory<typeof UiSliderMultipleItems> = (args) => (
 );
 
 export const Primary = Template.bind({});
-Primary.args = {};
+Primary.args = {
+  arrItems: arrContent,
+  timeChange: 3000,
+};

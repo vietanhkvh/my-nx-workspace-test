@@ -2,6 +2,10 @@
 import styles from './app.module.scss';
 import NxWelcome from './nx-welcome';
 import UiSlider from 'libs/ui-slider/src/lib/ui-slider';
+import {
+  UiSliderMultipleItems,
+  arrContent,
+} from '@my-nx-workspace/ui-slider-multiple-items';
 
 export function App() {
   return (
@@ -65,6 +69,11 @@ export function App() {
         ]}
         timeChange={2000}
         type={'dot'}
+      />
+      <UiSliderMultipleItems
+        arrItems={arrContent}
+        timeChange={3000}
+        typeDot={true}
       />
     </>
   );
