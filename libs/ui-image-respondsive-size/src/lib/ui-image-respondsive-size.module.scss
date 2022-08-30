@@ -1,7 +1,19 @@
-/*
- * Replace this with your own classes
- *
- * e.g.
- * .container {
- * }
-*/
+.img-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  padding: 100%;
+  background-position: center center;
+  background-size: cover;
+  .img-content {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    border: 0;
+    margin: 0;
+    padding: 0;
+    vertical-align: baseline;
+  }
+}

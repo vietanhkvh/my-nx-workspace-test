@@ -1,0 +1,11 @@
+.bigger-container {
+  width: 100%;
+  max-width: 640px;
+  padding: 0px;
+  .container {
+    padding: 41%;
+    // position: unset;
+    .content {
+    }
+  }
+}
