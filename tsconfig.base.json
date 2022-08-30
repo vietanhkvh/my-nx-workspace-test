@@ -15,6 +15,9 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
+      "@my-nx-workspace/ui-image-respondsive-size": [
+        "libs/ui-image-respondsive-size/src/index.ts"
+      ],
       "@my-nx-workspace/ui-slider": ["libs/ui-slider/src/index.ts"],
       "@my-nx-workspace/ui-slider-multiple-items": [
         "libs/ui-slider-multiple-items/src/index.ts"
