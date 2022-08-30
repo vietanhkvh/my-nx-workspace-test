@@ -44,36 +44,44 @@ export const arrContent = [
   },
 ];
 
+interface ContentContainerProps {
+  arrItems: Array<any>;
+  sliderIndex: number;
+  scrollToCurrent: (index: number) => void;
+  onNext: (arr: Array<any>) => void;
+  paused: boolean;
+  timeChange: number;
+  setSliderIndex: (index: number) => void;
+  onPlay: () => void;
+  onStop: () => void;
+}
 const ContentContainer = forwardRef(
-  (
-    props: {
-      arrItems: Array<any>;
-      sliderIndex: number;
-      scrollToCurrent: (sliderIndex: number) => void;
-      onNext: (arr: Array<any>) => void;
-      paused: boolean;
-      timeChange: number;
-    },
-    ref: any
-  ) => {
+  (props: ContentContainerProps, ref: any) => {
+    const {
+      arrItems = [],
+      sliderIndex = 0,
+      scrollToCurrent = (index = 0) => {},
+      onNext = ([]) => {},
+      paused = true,
+      timeChange = 0,
+      onPlay = () => {},
+      onStop = () => {},
+    } = props;
     const sliderRef = useRef<any>();
     useEffect(() => {
-      props.scrollToCurrent(props.sliderIndex);
-    }, [props, props.sliderIndex]);
+      scrollToCurrent(sliderIndex);
+    }, [scrollToCurrent, sliderIndex]);
     useEffect(() => {
-      const playSlider = setInterval(
-        () => props.onNext(props.arrItems),
-        props.timeChange
-      );
-      if (props.paused) {
+      const playSlider = setInterval(() => onNext(arrItems), timeChange);
+      if (paused) {
         clearInterval(playSlider);
-        props.scrollToCurrent(props.sliderIndex);
+        scrollToCurrent(sliderIndex);
       }
       return () => clearInterval(playSlider);
-    }, [props]);
+    }, [arrItems, onNext, paused, scrollToCurrent, sliderIndex, timeChange]);
     useEffect(() => {
       const slider = sliderRef.current;
-      let isDown = false;
+      let isDown: boolean;
       let startX: number;
       let scrollLeft: number;
       const mouseDown = (e: MouseEvent) => {
@@ -96,6 +104,7 @@ const ContentContainer = forwardRef(
         const x = e.screenX - slider.offsetLeft;
         const walk = x - startX; //scroll-fast
         slider.scrollLeft = scrollLeft - walk;
+        // setSliderIndex()
         console.log(walk);
       };
       slider.addEventListener('mousedown', mouseDown);
@@ -120,8 +129,10 @@ const ContentContainer = forwardRef(
           styles['member-container']
         )}
         ref={sliderRef}
+        onMouseEnter={onPlay}
+        onMouseLeave={onStop}
       >
-        {props.arrItems.map((a: any, i: number) => (
+        {arrItems.map((a: any, i: number) => (
           <div
             key={a.id}
             className={classNames(
@@ -146,7 +157,7 @@ interface BtnContainerProps {
   onPre: (par: Array<any>) => void;
   sliderIndex: number;
   typeDot: boolean;
-  scrollToCurrent: (index: number) => void;
+  setSliderIndex: (index: number) => void;
 }
 const BtnContainer: FC<BtnContainerProps> = (props) => {
   const {
@@ -157,25 +168,25 @@ const BtnContainer: FC<BtnContainerProps> = (props) => {
     arrItems = [],
     sliderIndex = 0,
     typeDot = true,
-    scrollToCurrent,
+    setSliderIndex,
   } = props;
 
   const dotDisplay = (type: boolean) =>
     type ? (
-      arrContent.map((a: any, i: any) => (
+      arrItems.map((a: any, i: any) => (
         <span
           key={a.id}
           className={classNames(
             styles['dot-member'],
             a.id === sliderIndex + 1 ? styles['current'] : ''
           )}
-          onClick={() => scrollToCurrent(i)}
+          onClick={() => setSliderIndex(i)}
         ></span>
       ))
     ) : (
       <>
         <span>{sliderIndex + 1}</span>
-        <span>/{arrContent.length}</span>
+        <span>/{arrItems.length}</span>
       </>
     );
   return (
@@ -227,6 +238,12 @@ export function UiSliderMultipleItems(props: UiSliderMultipleItemsProps) {
   const onPause = () => {
     setPaused((prevState) => !prevState);
   };
+  const onPlay = () => {
+    setPaused(true);
+  };
+  const onStop = () => {
+    setPaused(false);
+  };
   const onPre = () => {
     slideIndex === 0
       ? setSlideIndex(arrItems.length - 1)
@@ -240,19 +257,25 @@ export function UiSliderMultipleItems(props: UiSliderMultipleItemsProps) {
     },
     [slideIndex]
   );
+  const changeSlideIndex = (index: number) => {
+    setSlideIndex(index);
+  };
   const scrollToCurrent = (sliderIndex: number) => {
     sliderRef?.current[sliderIndex]?.scrollIntoView({ behavior: 'smooth' });
   };
   return (
     <div className={styles['slider-mul-container']}>
       <ContentContainer
+        ref={sliderRef}
         arrItems={arrItems}
         sliderIndex={slideIndex}
-        ref={sliderRef}
         scrollToCurrent={scrollToCurrent}
+        setSliderIndex={changeSlideIndex}
         paused={paused}
         onNext={onNext}
         timeChange={timeChange}
+        onPlay={onPlay}
+        onStop={onStop}
       />
       <BtnContainer
         paused={paused}
@@ -262,7 +285,7 @@ export function UiSliderMultipleItems(props: UiSliderMultipleItemsProps) {
         arrItems={arrItems}
         sliderIndex={slideIndex}
         typeDot={typeDot}
-        scrollToCurrent={scrollToCurrent}
+        setSliderIndex={changeSlideIndex}
       />
     </div>
   );
