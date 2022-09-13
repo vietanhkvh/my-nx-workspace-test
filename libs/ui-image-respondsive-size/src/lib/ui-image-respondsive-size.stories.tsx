@@ -18,4 +18,5 @@ Primary.args = {
     container: styles['container'],
     content: styles['content'],
   },
+  url: 'https://upload.lixibox.com/system/banners/covers/000/001/269/original/1660560523.jpg',
 };

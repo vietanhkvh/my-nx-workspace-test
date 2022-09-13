@@ -141,6 +141,7 @@ const ContentContainer = forwardRef(
             )}
             ref={(e) => (ref.current[i] = e)}
           >
+            {console.log('content', a.content)}
             {a.content}
           </div>
         ))}

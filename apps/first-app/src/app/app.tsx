@@ -2,11 +2,49 @@
 import styles from './app.module.scss';
 import NxWelcome from './nx-welcome';
 import UiSlider from 'libs/ui-slider/src/lib/ui-slider';
+import { UiImageRespondsiveSize } from '@my-nx-workspace/ui-image-respondsive-size';
 import {
   UiSliderMultipleItems,
   arrContent,
 } from '@my-nx-workspace/ui-slider-multiple-items';
-
+const arrContentNew = [
+  {
+    id: 1,
+    content: (
+      <UiImageRespondsiveSize
+        url="https://cdn.shopify.com/s/files/1/0592/3369/7845/files/Halio_web.jpg?v=1660533507&width=1100"
+        classnames={{
+          container: styles['container'],
+          content: styles['content'],
+        }}
+      />
+    ),
+  },
+  {
+    id: 2,
+    content: (
+      <UiImageRespondsiveSize
+        url="https://cdn.shopify.com/s/files/1/0592/3369/7845/files/ONE_IN_A_MELON_BANNER.png?v=1660299007&width=1100"
+        classnames={{
+          container: styles['container'],
+          content: styles['content'],
+        }}
+      />
+    ),
+  },
+  {
+    id: 3,
+    content: (
+      <UiImageRespondsiveSize
+        url="https://cdn.shopify.com/s/files/1/0592/3369/7845/files/ORANGE_BANNER.jpg?v=1660529073&width=1100"
+        classnames={{
+          container: styles['container'],
+          content: styles['content'],
+        }}
+      />
+    ),
+  },
+];
 export function App() {
   return (
     <>
@@ -71,7 +109,7 @@ export function App() {
         type={'dot'}
       />
       <UiSliderMultipleItems
-        arrItems={arrContent}
+        arrItems={arrContentNew}
         timeChange={3000}
         typeDot={true}
       />

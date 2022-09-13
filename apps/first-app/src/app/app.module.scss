@@ -1,1 +1,11 @@
-/* Your styles goes here. */
+.bigger-container {
+  width: 100%;
+  max-width: 55%;
+  padding: 0px;
+  .container {
+    padding: 41%;
+    // position: unset;
+    .content {
+    }
+  }
+}

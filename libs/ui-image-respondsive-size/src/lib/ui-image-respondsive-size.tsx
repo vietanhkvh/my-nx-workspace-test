@@ -7,17 +7,19 @@ interface IClassName {
   content: string;
 }
 export interface UiImageRespondsiveSizeProps {
-  classnames: IClassName;
+  classnames?: IClassName;
+  url: string;
 }
 
 export function UiImageRespondsiveSize(props: UiImageRespondsiveSizeProps) {
-  const { classnames = { container: '', wrapper: '', content: '' } } = props;
+  const { classnames = { container: '', wrapper: '', content: '' }, url } =
+    props;
   return (
     <div className={classNames(styles['img-container'], classnames.container)}>
       <img
         className={classNames(styles['img-content'], classnames.content)}
         alt=""
-        src="https://upload.lixibox.com/system/banners/covers/000/001/269/original/1660560523.jpg"
+        src={url}
       />
     </div>
   );
