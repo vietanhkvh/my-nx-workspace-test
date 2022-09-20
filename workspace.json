@@ -4,6 +4,7 @@
   "projects": {
     "first-app": "apps/first-app",
     "first-app-e2e": "apps/first-app-e2e",
+    "ui-img-galery-mobile": "libs/ui-img-galery-mobile",
     "ui-slider": "libs/ui-slider",
     "ui-slider-e2e": "apps/ui-slider-e2e"
   }
