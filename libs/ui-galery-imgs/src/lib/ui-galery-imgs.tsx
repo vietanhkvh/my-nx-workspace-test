@@ -1,5 +1,4 @@
 import classNames from 'classnames';
-import { stringify } from 'querystring';
 import {
   FC,
   forwardRef,
