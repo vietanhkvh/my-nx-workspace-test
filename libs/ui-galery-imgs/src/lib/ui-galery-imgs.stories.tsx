@@ -1,6 +1,5 @@
 import { ComponentStory, ComponentMeta } from '@storybook/react';
 import { UiGaleryImgs } from './ui-galery-imgs';
-
 export default {
   component: UiGaleryImgs,
   title: 'UiGaleryImgs',

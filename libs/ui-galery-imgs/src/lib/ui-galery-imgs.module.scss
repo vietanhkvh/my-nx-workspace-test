@@ -1,15 +1,50 @@
 .container {
-  .img-stage-container {
-    display: flex;
-    overflow: auto hidden;
-    -ms-overflow-style: none; /* IE and Edge */
-    scrollbar-width: none; /* Firefox */
-    ::-webkit-scrollbar {
-      display: none;
+  position: relative;
+  // display: block;
+  // width: 100%;
+  // margin-bottom: 20px;
+  // position: relative;
+  .img-statge-parent-container {
+    // margin-bottom: 20px;
+    // padding: 0px 50px;
+    // width: 100%;
+    // position: relative;
+    .img-statge-parent-wrapper {
+      // width: 100%;
+      // height: auto;
+      // padding-top: 67.7325%;
+      // background-size: contain;
+      // background-position: center center;
+      // background-repeat: no-repeat;
+      // position: relative;
+      .img-statge-parent {
+        // position: absolute;
+        // top: 0px;
+        // left: 0px;
+        // width: 100%;
+        // height: 100%;
+        .img-stage-container {
+          display: flex;
+          overflow: auto hidden;
+          scroll-snap-type: x mandatory;
+          -ms-overflow-style: none; /* IE and Edge */
+          scrollbar-width: none; /* Firefox */
+          &::-webkit-scrollbar {
+            display: none;
+          }
+        }
+      }
+    }
+    .img-index {
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
   }
-
   .img-small-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     .img-small {
       min-width: 110px;
       width: 110px;
@@ -22,5 +57,52 @@
         border: 1px solid red;
       }
     }
+    .active {
+      border: 1px solid red;
+    }
+  }
+  .popup-container {
+    // display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 50;
+    visibility: hidden;
+    opacity: 0;
+    transform: scale3d(0, 0, 0);
+    transition: all 0.3s ease-out 0s;
+    background: rgba(0, 2, 4, 0.7);
+    .popup-img-stage {
+      display: flex;
+      justify-content: center;
+    }
+    .pop-img-small {
+      .pop-img-small-member {
+        width: 60px;
+        height: 60px;
+      }
+    }
+    .modal-overlay {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0px;
+      left: 0px;
+      z-index: 10;
+      background: rgba(0, 2, 4, 0.5);
+      opacity: 0;
+      visibility: hidden;
+    }
+    .overlay-appear {
+      opacity: 1;
+      visibility: visible;
+    }
+  }
+  .popup-appear {
+    visibility: visible;
+    opacity: 1;
+    transform: scale3d(1, 1, 1);
   }
 }
