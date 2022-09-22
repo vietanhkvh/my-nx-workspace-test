@@ -48,12 +48,15 @@ interface ContentContainerProps {
   arrItems: Array<any>;
   sliderIndex: number;
   scrollToCurrent: (index: number) => void;
-  onNext: (arr: Array<any>) => void;
+  onNext: () => void;
+  onPre: () => void;
   paused: boolean;
   timeChange: number;
   setSliderIndex: (index: number) => void;
   onPlay: () => void;
   onStop: () => void;
+  // handleTouchStart: (par: any) => void;
+  // handleTouchMove: (par: any) => void;
 }
 const ContentContainer = forwardRef(
   (props: ContentContainerProps, ref: any) => {
@@ -61,67 +64,92 @@ const ContentContainer = forwardRef(
       arrItems = [],
       sliderIndex = 0,
       scrollToCurrent = (index = 0) => {},
-      onNext = ([]) => {},
+      onNext = () => {},
+      onPre,
       paused = true,
       timeChange = 0,
       onPlay = () => {},
       onStop = () => {},
     } = props;
     const sliderRef = useRef<any>();
+    const [touchPosition, setTouchPosition] = useState(null);
+    const [upPosition, setUpPosition] = useState(null);
+
+    const handleTouchStart = (e: any) => {
+      const touchDown = e?.touches[0].clientX;
+      setTouchPosition(touchDown);
+    };
+
+    const handleTouchMove = (e: any) => {
+      const touchDown = touchPosition;
+      // const touchUp = upPosition;
+      // if (touchDown === null || touchUp === null) {
+      //   return;
+      // }
+      if (touchDown === null) {
+        return;
+      }
+      const currentTouch = e.changedTouches[0].clientX;
+
+      const diff = touchDown - currentTouch;
+      console.log('diff', diff);
+      if (diff > 0) {
+        // setTimeout(() => onNext(), 500);
+        onNext();
+      } else if (diff < 0) {
+        // setTimeout(() => onPre(), 500);
+        onPre();
+      }
+
+      setTouchPosition(null);
+      setUpPosition(null);
+    };
+
+    const handleTouchEnd = (e: any) => {
+      const touchUp = e.changedTouches[0].clientX;
+      setUpPosition(touchUp);
+    };
+
+    const handleMouseDown = (e: any) => {
+      const touchDown = e.clientX;
+      setTouchPosition(touchDown);
+    };
+
+    const handleMouseMove = (e: any) => {
+      const touchDown = touchPosition;
+      const touchUp = upPosition;
+      if (touchDown === null || touchUp === null) {
+        return;
+      }
+
+      const diff = touchDown - touchUp;
+      if (diff > 0) {
+        onNext();
+      } else if (diff < 0) {
+        onPre();
+      }
+
+      setTouchPosition(null);
+      setUpPosition(null);
+    };
+
+    const handleMouseUp = (e: any) => {
+      const touchUp = e.clientX;
+      setUpPosition(touchUp);
+    };
     useEffect(() => {
       scrollToCurrent(sliderIndex);
     }, [scrollToCurrent, sliderIndex]);
+
     useEffect(() => {
-      const playSlider = setInterval(() => onNext(arrItems), timeChange);
+      const playSlider = setInterval(() => onNext(), timeChange);
       if (paused) {
         clearInterval(playSlider);
         scrollToCurrent(sliderIndex);
       }
       return () => clearInterval(playSlider);
     }, [arrItems, onNext, paused, scrollToCurrent, sliderIndex, timeChange]);
-    useEffect(() => {
-      const slider = sliderRef.current;
-      let isDown: boolean;
-      let startX: number;
-      let scrollLeft: number;
-      const mouseDown = (e: MouseEvent) => {
-        isDown = true;
-        slider?.classList.add('active');
-        startX = e.screenX - slider.clientLeft;
-        scrollLeft = slider.scrollLeft;
-      };
-      const mouseLeave = () => {
-        isDown = false;
-        slider.classList.remove('active');
-      };
-      const mouseUp = () => {
-        isDown = false;
-        slider.classList.remove('active');
-      };
-      const mouseMove = (e: MouseEvent) => {
-        if (!isDown) return;
-        e.preventDefault();
-        const x = e.screenX - slider.offsetLeft;
-        const walk = x - startX; //scroll-fast
-        slider.scrollLeft = scrollLeft - walk;
-        // setSliderIndex()
-        console.log(walk);
-      };
-      slider.addEventListener('mousedown', mouseDown);
 
-      slider?.addEventListener('mouseleave', mouseLeave);
-
-      slider?.addEventListener('mouseup', mouseUp);
-
-      slider?.addEventListener('mousemove', mouseMove);
-
-      return () => {
-        slider?.removeEventListener('mousedown', mouseDown);
-        slider?.removeEventListener('mouseleave', mouseLeave);
-        slider?.removeEventListener('mouseup', mouseUp);
-        slider?.removeEventListener('mousemove', mouseMove);
-      };
-    }, []);
     return (
       <div
         className={classNames(
@@ -131,6 +159,16 @@ const ContentContainer = forwardRef(
         ref={sliderRef}
         onMouseEnter={onPlay}
         onMouseLeave={onStop}
+        onMouseDown={(e) => {
+          e.preventDefault();
+          handleMouseDown(e);
+        }}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+
+        // onScroll={(e) => {
+        //   console.log(e);
+        // }}
       >
         {arrItems.map((a: any, i: number) => (
           <div
@@ -140,6 +178,12 @@ const ContentContainer = forwardRef(
               // props.sliderIndex === i ? styles['active'] : styles['hidden']
             )}
             ref={(e) => (ref.current[i] = e)}
+            onTouchStart={(e) => {
+              onPlay();
+              handleTouchStart(e);
+            }}
+            onTouchMove={handleTouchMove}
+            // onTouchEnd={(e) => handleTouchEnd(e)}
           >
             {a.content}
           </div>
@@ -178,7 +222,7 @@ const BtnContainer: FC<BtnContainerProps> = (props) => {
           key={a.id}
           className={classNames(
             styles['dot-member'],
-            a.id === sliderIndex + 1 ? styles['current'] : ''
+            a.id === sliderIndex + 1 && styles['current']
           )}
           onClick={() => setSliderIndex(i)}
         ></span>
@@ -235,6 +279,7 @@ export function UiSliderMultipleItems(props: UiSliderMultipleItemsProps) {
   const [paused, setPaused] = useState<boolean>(false);
   const [slideIndex, setSlideIndex] = useState<number>(0);
   const sliderRef = useRef<any>([]);
+
   const onPause = () => {
     setPaused((prevState) => !prevState);
   };
@@ -245,24 +290,25 @@ export function UiSliderMultipleItems(props: UiSliderMultipleItemsProps) {
     setPaused(false);
   };
   const onPre = () => {
-    slideIndex === 0
-      ? setSlideIndex(arrItems.length - 1)
-      : setSlideIndex((preSlideIndex) => preSlideIndex - 1);
+    if (slideIndex > 0) setSlideIndex((preSlideIndex) => preSlideIndex - 1);
+    else if (slideIndex === 0) setSlideIndex(arrItems?.length - 1);
   };
-  const onNext = useCallback(
-    (arrItems: Array<any>) => {
-      slideIndex === arrItems?.length - 1
-        ? setSlideIndex(0)
-        : setSlideIndex((preSliderIndex) => preSliderIndex + 1);
-    },
-    [slideIndex]
-  );
+  const onNext = () => {
+    if (slideIndex === arrItems?.length - 1) setSlideIndex(0);
+    else if (slideIndex < arrItems?.length - 1)
+      setSlideIndex((preSliderIndex) => preSliderIndex + 1);
+  };
+
+  console.log('slideIndex', slideIndex);
   const changeSlideIndex = (index: number) => {
     setSlideIndex(index);
   };
   const scrollToCurrent = (sliderIndex: number) => {
-    sliderRef?.current[sliderIndex]?.scrollIntoView({ behavior: 'smooth' });
+    sliderRef?.current[sliderIndex]?.scrollIntoView({
+      behavior: 'smooth',
+    });
   };
+
   return (
     <div className={styles['slider-mul-container']}>
       <ContentContainer
@@ -273,9 +319,12 @@ export function UiSliderMultipleItems(props: UiSliderMultipleItemsProps) {
         setSliderIndex={changeSlideIndex}
         paused={paused}
         onNext={onNext}
+        onPre={onPre}
         timeChange={timeChange}
         onPlay={onPlay}
         onStop={onStop}
+        // handleTouchStart={handleTouchStart}
+        // handleTouchMove={handleTouchMove}
       />
       <BtnContainer
         paused={paused}
