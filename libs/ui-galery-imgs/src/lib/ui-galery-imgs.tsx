@@ -9,7 +9,7 @@ import {
 } from 'react';
 import styles from './ui-galery-imgs.module.scss';
 export const dataImgs = [
-  'https://upload.lixibox.com/system/pictures/files/000/075/347/large/1662612004.png?v=2',
+  '	https://upload.lixibox.com/system/pictures/files/000/071/134/large/1648711146.jpg?v=4',
   'https://upload.lixibox.com/system/pictures/files/000/073/592/large/1656058355.png?v=2',
   'https://upload.lixibox.com/system/pictures/files/000/073/593/large/1656058383.png?v=2',
   'https://upload.lixibox.com/system/pictures/files/000/073/594/large/1656058429.png?v=2',
@@ -62,10 +62,25 @@ interface ImgSmallProps {
     main?: string;
     member?: string;
   };
+  imgDisplay?: number;
+  chooseCurrentIndex: (par: number) => void;
 }
 const ImgSmall = forwardRef((props: ImgSmallProps, ref: any) => {
-  const { data, idCur, setIndexCurrent, openPopup, stopClose, classnames } =
-    props;
+  const {
+    data,
+    idCur,
+    setIndexCurrent,
+    openPopup,
+    stopClose,
+    classnames,
+    imgDisplay,
+    chooseCurrentIndex,
+  } = props;
+  const length = data.length;
+  const leffNumImg = imgDisplay ? length - imgDisplay : 0;
+  const newData =
+    length === imgDisplay ? data : data.slice(0, imgDisplay && imgDisplay - 1);
+  console.log('length', data.slice(0, imgDisplay).length);
   return (
     <div
       className={classNames(
@@ -73,7 +88,7 @@ const ImgSmall = forwardRef((props: ImgSmallProps, ref: any) => {
         styles['img-small-container']
       )}
     >
-      {data.map((d: any, i: number) => (
+      {newData.map((d: any, i: number) => (
         <img
           className={classNames(
             classnames?.member !== null && classnames?.member,
@@ -84,13 +99,41 @@ const ImgSmall = forwardRef((props: ImgSmallProps, ref: any) => {
           key={i}
           src={d}
           alt=""
-          onMouseEnter={() => setIndexCurrent(i)}
+          onMouseEnter={() => {
+            setIndexCurrent(i);
+            chooseCurrentIndex(i);
+          }}
           onClick={(e) => {
             openPopup && openPopup();
             stopClose && stopClose(e);
           }}
         />
       ))}
+      {imgDisplay && imgDisplay < length && (
+        <div
+          className={styles['last-img']}
+          onClick={(e) => {
+            openPopup && openPopup();
+            stopClose && stopClose(e);
+          }}
+        >
+          <img
+            className={classNames(
+              classnames?.member !== null && classnames?.member,
+              styles['img-small']
+            )}
+            src={imgDisplay && data[Math.abs(imgDisplay - leffNumImg + 1)]}
+            onMouseEnter={() => chooseCurrentIndex(length - 1 - leffNumImg)}
+            alt=""
+          />
+          <div className={styles['img-last-index']} />
+          <div className={styles['text']}>
+            Xem thêm
+            <br />
+            {leffNumImg} hình ảnh
+          </div>
+        </div>
+      )}
     </div>
   );
 });
@@ -147,14 +190,18 @@ const ImgGaleryPopup = forwardRef((props: ImgGaleryPopupProps, ref?) => {
           main: styles['pop-img-small'],
           member: styles['pop-img-small-member'],
         }}
+        chooseCurrentIndex={chooseCurrentIndex}
       />
     </div>
   );
 });
 /* eslint-disable-next-line */
-export interface UiGaleryImgsProps {}
+export interface UiGaleryImgsProps {
+  imgDisplay: number;
+}
 
 export function UiGaleryImgs(props: UiGaleryImgsProps) {
+  const { imgDisplay = 4 } = props;
   const [indexCurrent, setIndexCurrent] = useState<number>(0);
   const [idCurPop, setIdCurPop] = useState<number>(1);
   const [isPopup, setIsPopup] = useState<boolean>(false);
@@ -180,13 +227,15 @@ export function UiGaleryImgs(props: UiGaleryImgsProps) {
         idCur={indexCurrent}
         setIndexCurrent={setIndexCurrent}
         openPopup={setPopupT}
+        imgDisplay={imgDisplay}
+        chooseCurrentIndex={setIdCurPop}
       />
       <ImgGaleryPopup
         data={dataImgs}
         isPopup={isPopup}
         closePopup={setPopupF}
-        idCurPop={indexCurrent}
-        chooseCurrentIndex={setIndexCurrent}
+        idCurPop={idCurPop}
+        chooseCurrentIndex={setIdCurPop}
         ref={imgRef}
       />
     </div>

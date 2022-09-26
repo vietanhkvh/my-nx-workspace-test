@@ -10,4 +10,6 @@ const Template: ComponentStory<typeof UiGaleryImgs> = (args) => (
 );
 
 export const Primary = Template.bind({});
-Primary.args = {};
+Primary.args = {
+  imgDisplay: 4,
+};
