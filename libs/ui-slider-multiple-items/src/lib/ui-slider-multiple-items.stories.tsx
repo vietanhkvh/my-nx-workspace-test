@@ -13,5 +13,5 @@ const Template: ComponentStory<typeof UiSliderMultipleItems> = (args) => (
 export const Primary = Template.bind({});
 Primary.args = {
   arrItems: arrContent,
-  timeChange: 3000,
+  timeChange: 1000,
 };

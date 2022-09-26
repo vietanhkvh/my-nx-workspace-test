@@ -1,60 +1,36 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable no-empty-pattern */
 import classNames from 'classnames';
-import {
-  FC,
-  forwardRef,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import { FC, forwardRef, useEffect, useRef, useState } from 'react';
 import styles from './ui-slider-multiple-items.module.scss';
 
 export const arrContent = [
   {
     id: 1,
-    content: (
-      <img
-        src="https://cdn.shopify.com/s/files/1/0592/3369/7845/files/Halio_web.jpg?v=1660533507&width=1100"
-        alt=""
-        loading="lazy"
-      />
-    ),
+    src: 'https://cdn.shopify.com/s/files/1/0592/3369/7845/files/Halio_web.jpg?v=1660533507&width=1100',
   },
   {
     id: 2,
-    content: (
-      <img
-        src="https://cdn.shopify.com/s/files/1/0592/3369/7845/files/ONE_IN_A_MELON_BANNER.png?v=1660299007&width=1100"
-        alt=""
-        loading="lazy"
-      />
-    ),
+    src: 'https://cdn.shopify.com/s/files/1/0592/3369/7845/files/ONE_IN_A_MELON_BANNER.png?v=1660299007&width=1100',
   },
   {
     id: 3,
-    content: (
-      <img
-        src="https://cdn.shopify.com/s/files/1/0592/3369/7845/files/ORANGE_BANNER.jpg?v=1660529073&width=1100"
-        alt=""
-        loading="lazy"
-      />
-    ),
+    src: 'https://cdn.shopify.com/s/files/1/0592/3369/7845/files/ORANGE_BANNER.jpg?v=1660529073&width=1100',
   },
 ];
 
 interface ContentContainerProps {
   arrItems: Array<any>;
   sliderIndex: number;
+  setSliderIndex: (index: number) => void;
   scrollToCurrent: (index: number) => void;
   onNext: () => void;
   onPre: () => void;
   paused: boolean;
   timeChange: number;
-  setSliderIndex: (index: number) => void;
   onPlay: () => void;
   onStop: () => void;
+  containerRef: any;
   // handleTouchStart: (par: any) => void;
   // handleTouchMove: (par: any) => void;
 }
@@ -63,6 +39,7 @@ const ContentContainer = forwardRef(
     const {
       arrItems = [],
       sliderIndex = 0,
+      setSliderIndex = () => {},
       scrollToCurrent = (index = 0) => {},
       onNext = () => {},
       onPre,
@@ -70,22 +47,21 @@ const ContentContainer = forwardRef(
       timeChange = 0,
       onPlay = () => {},
       onStop = () => {},
+      containerRef = {},
     } = props;
-    const sliderRef = useRef<any>();
+
     const [touchPosition, setTouchPosition] = useState(null);
     const [upPosition, setUpPosition] = useState(null);
 
-    const handleTouchStart = (e: any) => {
-      const touchDown = e?.touches[0].clientX;
+    const handleTouchStart = (e: any, type: string) => {
+      e.preventDefault();
+      const touchDown = type === 'touch' ? e?.touches[0].clientX : e.clientX;
       setTouchPosition(touchDown);
     };
 
     const handleTouchMove = (e: any) => {
+      e.preventDefault();
       const touchDown = touchPosition;
-      // const touchUp = upPosition;
-      // if (touchDown === null || touchUp === null) {
-      //   return;
-      // }
       if (touchDown === null) {
         return;
       }
@@ -93,11 +69,9 @@ const ContentContainer = forwardRef(
 
       const diff = touchDown - currentTouch;
       console.log('diff', diff);
-      if (diff > 0) {
-        // setTimeout(() => onNext(), 500);
+      if (diff > 5) {
         onNext();
-      } else if (diff < 0) {
-        // setTimeout(() => onPre(), 500);
+      } else if (diff < 5) {
         onPre();
       }
 
@@ -105,17 +79,15 @@ const ContentContainer = forwardRef(
       setUpPosition(null);
     };
 
-    const handleTouchEnd = (e: any) => {
-      const touchUp = e.changedTouches[0].clientX;
+    const handleTouchEnd = (e: any, type: string) => {
+      e.preventDefault();
+      const touchUp =
+        type === 'touch' ? e.changedTouches[0].clientX : e.clientX;
       setUpPosition(touchUp);
     };
 
-    const handleMouseDown = (e: any) => {
-      const touchDown = e.clientX;
-      setTouchPosition(touchDown);
-    };
-
     const handleMouseMove = (e: any) => {
+      e.preventDefault();
       const touchDown = touchPosition;
       const touchUp = upPosition;
       if (touchDown === null || touchUp === null) {
@@ -123,6 +95,9 @@ const ContentContainer = forwardRef(
       }
 
       const diff = touchDown - touchUp;
+      console.log('event', e);
+      console.log('containerRef', containerRef.current.scrollLeft);
+      console.log('diff', diff);
       if (diff > 0) {
         onNext();
       } else if (diff < 0) {
@@ -133,22 +108,23 @@ const ContentContainer = forwardRef(
       setUpPosition(null);
     };
 
-    const handleMouseUp = (e: any) => {
-      const touchUp = e.clientX;
-      setUpPosition(touchUp);
+    const handleOnScroll = (e: any) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const idCur = arrItems.findIndex((a) => a.src === e.target.src);
+      console.log('idCur', idCur);
+      setSliderIndex(idCur);
     };
-    useEffect(() => {
-      scrollToCurrent(sliderIndex);
-    }, [scrollToCurrent, sliderIndex]);
 
     useEffect(() => {
+      scrollToCurrent(sliderIndex);
       const playSlider = setInterval(() => onNext(), timeChange);
       if (paused) {
         clearInterval(playSlider);
-        scrollToCurrent(sliderIndex);
       }
+
       return () => clearInterval(playSlider);
-    }, [arrItems, onNext, paused, scrollToCurrent, sliderIndex, timeChange]);
+    }, [onNext, paused, scrollToCurrent, sliderIndex, timeChange]);
 
     return (
       <div
@@ -156,38 +132,49 @@ const ContentContainer = forwardRef(
           styles['content-container'],
           styles['member-container']
         )}
-        ref={sliderRef}
+        ref={containerRef}
         onMouseEnter={onPlay}
-        onMouseLeave={onStop}
         onMouseDown={(e) => {
-          e.preventDefault();
-          handleMouseDown(e);
+          handleTouchStart(e, 'mouse');
         }}
         onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-
-        // onScroll={(e) => {
-        //   console.log(e);
-        // }}
+        onMouseUp={(e) => handleTouchEnd(e, 'mouse')}
+        // onScroll={handleOnScroll}
+        // onScroll={() => console.log(1)
       >
+        <button
+          className={classNames(
+            styles['btn-content'],
+            styles['pre-btn-content']
+          )}
+          onClick={onPre}
+        >
+          {'<'}
+        </button>
         {arrItems.map((a: any, i: number) => (
           <div
             key={a.id}
-            className={classNames(
-              styles['img-wrapper']
-              // props.sliderIndex === i ? styles['active'] : styles['hidden']
-            )}
+            className={classNames(styles['img-wrapper'])}
             ref={(e) => (ref.current[i] = e)}
             onTouchStart={(e) => {
               onPlay();
-              handleTouchStart(e);
+              handleTouchStart(e, 'touch');
             }}
             onTouchMove={handleTouchMove}
-            // onTouchEnd={(e) => handleTouchEnd(e)}
+            onMouseEnter={handleOnScroll}
           >
-            {a.content}
+            <img src={a.src} alt="" loading="lazy" />
           </div>
         ))}
+        <button
+          className={classNames(
+            styles['btn-content'],
+            styles['next-btn-content']
+          )}
+          onClick={onNext}
+        >
+          {'>'}
+        </button>
       </div>
     );
   }
@@ -197,22 +184,24 @@ interface BtnContainerProps {
   paused: boolean;
   arrItems: Array<any>;
   onPause: () => void;
-  onNext: (par: Array<any>) => void;
-  onPre: (par: Array<any>) => void;
+  onNext: () => void;
+  onPre: () => void;
   sliderIndex: number;
   typeDot: boolean;
   setSliderIndex: (index: number) => void;
+  onPlay: () => void;
 }
 const BtnContainer: FC<BtnContainerProps> = (props) => {
   const {
     paused,
     onPause,
-    onNext = ([]) => {},
-    onPre = ([]) => {},
+    onNext = () => {},
+    onPre = () => {},
     arrItems = [],
     sliderIndex = 0,
     typeDot = true,
     setSliderIndex,
+    onPlay = () => {},
   } = props;
 
   const dotDisplay = (type: boolean) =>
@@ -224,7 +213,10 @@ const BtnContainer: FC<BtnContainerProps> = (props) => {
             styles['dot-member'],
             a.id === sliderIndex + 1 && styles['current']
           )}
-          onClick={() => setSliderIndex(i)}
+          onClick={() => {
+            setSliderIndex(i);
+            onPlay();
+          }}
         ></span>
       ))
     ) : (
@@ -243,7 +235,10 @@ const BtnContainer: FC<BtnContainerProps> = (props) => {
       <div className={classNames(styles['btn-wrapper'])}>
         <button
           className={classNames(styles['btn'], styles['btn-pre'])}
-          onClick={() => onPre(arrItems)}
+          onClick={() => {
+            onPre();
+            onPlay();
+          }}
         >
           {'<'}
         </button>
@@ -252,7 +247,10 @@ const BtnContainer: FC<BtnContainerProps> = (props) => {
         </div>
         <button
           className={classNames(styles['btn'], styles['btn-next'])}
-          onClick={() => onNext(arrItems)}
+          onClick={() => {
+            onNext();
+            onPlay();
+          }}
         >
           {'>'}
         </button>
@@ -278,8 +276,8 @@ export function UiSliderMultipleItems(props: UiSliderMultipleItemsProps) {
   const { arrItems = arrContent, timeChange = 3000, typeDot = true } = props;
   const [paused, setPaused] = useState<boolean>(false);
   const [slideIndex, setSlideIndex] = useState<number>(0);
+  const containerRef = useRef<any>();
   const sliderRef = useRef<any>([]);
-
   const onPause = () => {
     setPaused((prevState) => !prevState);
   };
@@ -290,8 +288,9 @@ export function UiSliderMultipleItems(props: UiSliderMultipleItemsProps) {
     setPaused(false);
   };
   const onPre = () => {
-    if (slideIndex > 0) setSlideIndex((preSlideIndex) => preSlideIndex - 1);
-    else if (slideIndex === 0) setSlideIndex(arrItems?.length - 1);
+    if (slideIndex === 0) setSlideIndex(arrItems?.length - 1);
+    else if (slideIndex > 0)
+      setSlideIndex((preSlideIndex) => preSlideIndex - 1);
   };
   const onNext = () => {
     if (slideIndex === arrItems?.length - 1) setSlideIndex(0);
@@ -299,20 +298,22 @@ export function UiSliderMultipleItems(props: UiSliderMultipleItemsProps) {
       setSlideIndex((preSliderIndex) => preSliderIndex + 1);
   };
 
-  console.log('slideIndex', slideIndex);
   const changeSlideIndex = (index: number) => {
     setSlideIndex(index);
   };
   const scrollToCurrent = (sliderIndex: number) => {
+    setSlideIndex(sliderIndex);
     sliderRef?.current[sliderIndex]?.scrollIntoView({
       behavior: 'smooth',
     });
   };
-
+  // console.log('containerRef', containerRef.current.scrollLeft);
+  // console.log('sliderRef', sliderRef);
   return (
     <div className={styles['slider-mul-container']}>
       <ContentContainer
         ref={sliderRef}
+        containerRef={containerRef}
         arrItems={arrItems}
         sliderIndex={slideIndex}
         scrollToCurrent={scrollToCurrent}
@@ -323,12 +324,11 @@ export function UiSliderMultipleItems(props: UiSliderMultipleItemsProps) {
         timeChange={timeChange}
         onPlay={onPlay}
         onStop={onStop}
-        // handleTouchStart={handleTouchStart}
-        // handleTouchMove={handleTouchMove}
       />
       <BtnContainer
         paused={paused}
         onPause={onPause}
+        onPlay={onPlay}
         onNext={onNext}
         onPre={onPre}
         arrItems={arrItems}
