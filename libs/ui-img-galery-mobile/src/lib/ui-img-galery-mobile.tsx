@@ -46,9 +46,6 @@ interface ImgGaleryProps {
   setOffsetLeftCur: (par: number) => void;
   openPopup: () => void;
   setIdCurPop: (par: number) => void;
-  // onTouchStart: (par: any) => void;
-  // onTouchMove: (par: any) => void;
-  // onTouchEnd: () => void;
 }
 const ImgGalery = forwardRef((props: ImgGaleryProps, ref: any) => {
   const { data, onChangeImage, openPopup, setIdCurPop } = props;
@@ -106,9 +103,21 @@ interface ImgPopUpProps {
   closePopup: () => void;
   idCurPop: number;
   setIdCurPop: (par: number) => void;
+  onTouchStart: (par: any) => void;
+  onTouchMove: (par: any) => void;
+  onTouchEnd: (par: any) => void;
 }
 const ImgPopUp = forwardRef((props: ImgPopUpProps, ref: any) => {
-  const { data, isPopup, closePopup, idCurPop, setIdCurPop } = props;
+  const {
+    data,
+    isPopup,
+    closePopup,
+    idCurPop,
+    setIdCurPop,
+    onTouchStart,
+    onTouchEnd,
+    onTouchMove,
+  } = props;
   const handleOnScroll = (e: any) => {
     const clientWidth = e.currentTarget.clientWidth;
     const scrollLeft = e.currentTarget.scrollLeft;
@@ -130,7 +139,13 @@ const ImgPopUp = forwardRef((props: ImgPopUpProps, ref: any) => {
       <button className={styles['popup-btn-close']} onClick={closePopup}>
         X
       </button>
-      <div className={styles['img-container']} onScroll={handleOnScroll}>
+      <div
+        className={styles['img-container']}
+        onScroll={handleOnScroll}
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
+      >
         {data.map((d: any, i: number) => (
           <div
             className={styles['img-wrapper']}
@@ -159,6 +174,7 @@ export function UiImgGaleryMobile(props: UiImgGaleryMobileProps) {
   const [idCurrent, setIdCurrent] = useState<number>(1);
   const [idCurPop, setIdCurPop] = useState<number>(1);
   const [touchPosition, setTouchPosition] = useState(null);
+  const [upPosition, setUpPosition] = useState(null);
   const [offSetLeftCur, setOffSetLeftCur] = useState<number>(0);
   const [isPopup, setIsPopup] = useState<boolean>(false);
 
@@ -187,24 +203,28 @@ export function UiImgGaleryMobile(props: UiImgGaleryMobileProps) {
     setTouchPosition(touchDown);
   };
   const handleTouchMove = (e: any) => {
+    e.preventDefault();
     const touchDown = touchPosition;
-
     if (touchDown === null) {
       return;
     }
+    const currentTouch = e.changedTouches[0].clientX;
 
-    const currentTouch = e.touches[0].clientX;
     const diff = touchDown - currentTouch;
-
+    console.log('diff', diff);
     if (diff > 5) {
       onSwipeNext();
-    }
-
-    if (diff < -5) {
+    } else if (diff < 5) {
       onSwipePre();
     }
 
     setTouchPosition(null);
+    setUpPosition(null);
+  };
+  const handleTouchEnd = (e: any) => {
+    e.preventDefault();
+    const touchUp = e.changedTouches[0].clientX;
+    setUpPosition(touchUp);
   };
   const imgRef = useRef<any>([]);
   const imgRefPopup = useRef<any>([]);
@@ -227,6 +247,9 @@ export function UiImgGaleryMobile(props: UiImgGaleryMobileProps) {
         closePopup={closePopup}
         idCurPop={idCurPop}
         setIdCurPop={setIdCurPop}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
       />
     </div>
   );
