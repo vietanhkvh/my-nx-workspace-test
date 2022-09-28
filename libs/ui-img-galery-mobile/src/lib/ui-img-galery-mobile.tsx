@@ -141,10 +141,7 @@ const ImgPopUp = forwardRef((props: ImgPopUpProps, ref: any) => {
       </button>
       <div
         className={styles['img-container']}
-        onScroll={handleOnScroll}
-        onTouchStart={onTouchStart}
-        onTouchMove={onTouchMove}
-        onTouchEnd={onTouchEnd}
+        // onScroll={handleOnScroll}
       >
         {data.map((d: any, i: number) => (
           <div
@@ -152,7 +149,14 @@ const ImgPopUp = forwardRef((props: ImgPopUpProps, ref: any) => {
             key={i}
             ref={(e) => (ref.current[i + 1] = e)}
           >
-            <img className={styles['img-popup']} src={d} alt="" />
+            <img
+              className={styles['img-popup']}
+              src={d}
+              alt=""
+              onTouchStart={onTouchStart}
+              onTouchMove={onTouchMove}
+              onTouchEnd={onTouchEnd}
+            />
           </div>
         ))}
       </div>
@@ -192,10 +196,14 @@ export function UiImgGaleryMobile(props: UiImgGaleryMobileProps) {
   //   setIdCurPop(preId=> preId+1)
   // }
   const onSwipeNext = () => {
-    idCurrent > 0 && setIdCurrent((preId) => preId + 1);
+    idCurrent < data.length
+      ? setIdCurrent((preId) => preId + 1)
+      : setIdCurPop(0);
   };
   const onSwipePre = () => {
-    idCurrent < data.length && setIdCurrent((preId) => preId - 1);
+    idCurrent === 0
+      ? setIdCurPop(data.length)
+      : setIdCurrent((preId) => preId - 1);
   };
 
   const handleTouchStart = (e: any) => {
@@ -203,7 +211,6 @@ export function UiImgGaleryMobile(props: UiImgGaleryMobileProps) {
     setTouchPosition(touchDown);
   };
   const handleTouchMove = (e: any) => {
-    e.preventDefault();
     const touchDown = touchPosition;
     if (touchDown === null) {
       return;
@@ -222,7 +229,6 @@ export function UiImgGaleryMobile(props: UiImgGaleryMobileProps) {
     setUpPosition(null);
   };
   const handleTouchEnd = (e: any) => {
-    e.preventDefault();
     const touchUp = e.changedTouches[0].clientX;
     setUpPosition(touchUp);
   };
