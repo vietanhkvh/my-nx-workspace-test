@@ -1,10 +1,10 @@
 import { render } from '@testing-library/react';
 
-import UiAntdAntdDesk from './ui-antd-antd-desk';
+import Swipes from './swipes';
 
-describe('UiAntdAntdDesk', () => {
+describe('Swipes', () => {
   it('should render successfully', () => {
-    const { baseElement } = render(<UiAntdAntdDesk />);
+    const { baseElement } = render(<Swipes />);
     expect(baseElement).toBeTruthy();
   });
 });
