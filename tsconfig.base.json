@@ -15,7 +15,6 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@my-nx-workspace/ui-antd": ["libs/ui-antd/src/index.ts"],
       "@my-nx-workspace/ui-antd/antd-desk": [
         "libs/ui-antd/antd-desk/src/index.ts"
       ],
