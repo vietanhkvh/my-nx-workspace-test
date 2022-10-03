@@ -1,16 +1,17 @@
-import { match } from 'assert';
+/* eslint-disable react-hooks/exhaustive-deps */
 import classNames from 'classnames';
+import _ from 'lodash';
+import React from 'react';
 import {
   FC,
   forwardRef,
-  RefAttributes,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
 } from 'react';
 import styles from './ui-img-galery-mobile.module.scss';
-
 export const dataImgs = [
   'https://upload.lixibox.com/system/pictures/files/000/071/134/large/1648711146.jpg?v=4',
   'https://upload.lixibox.com/system/pictures/files/000/073/592/large/1656058355.png?v=2',
@@ -18,65 +19,49 @@ export const dataImgs = [
   'https://upload.lixibox.com/system/pictures/files/000/073/594/large/1656058429.png?v=2',
   'https://upload.lixibox.com/system/pictures/files/000/073/594/large/1656058429.png?v=2',
 ];
-const useIsInViewport = (ref: any, index?: number) => {
-  const [isIntersecting, setIsIntersecting] = useState<boolean>(false);
 
-  const observer = useMemo(
-    () =>
-      new IntersectionObserver(([entry]) =>
-        setIsIntersecting(entry.isIntersecting)
-      ),
-    []
-  );
-
-  useEffect(() => {
-    // if (ref.current?.length) observer.observe(ref.current[index!]);
-    observer.observe(ref?.current);
-    return () => {
-      observer.disconnect();
-    };
-  }, [ref, observer]);
-
-  return isIntersecting;
-};
 interface ImgGaleryProps {
   data: Array<string>;
   onChangeImage: (par: number) => void;
-  offsetLeftCur: number;
-  setOffsetLeftCur: (par: number) => void;
   openPopup: () => void;
   setIdCurPop: (par: number) => void;
 }
-const ImgGalery = forwardRef((props: ImgGaleryProps, ref: any) => {
-  const { data, onChangeImage, openPopup, setIdCurPop } = props;
-  // const isInViewport = useIsInViewport(ref?.current[1]);
-  // console.log('isInViewport1: ', isInViewport);
-  const handleScroll = (event: any) => {
-    const scrollLeft = event.currentTarget.scrollLeft;
-    const withElement = event.currentTarget.offsetWidth;
-    const id = Math.floor(scrollLeft / withElement) + 1;
-    onChangeImage(id);
-  };
-  return (
-    <div
-      className={styles['img-galery-container']}
-      onScroll={handleScroll}
-      onClick={openPopup}
-    >
-      {data &&
-        data.map((d: any, i: number) => (
-          <img
-            className={styles['img-galery']}
-            key={i}
-            src={d}
-            alt={''}
-            ref={(e) => (ref.current[i + 1] = e)}
-            onClick={() => setIdCurPop(i + 1)}
-          />
-        ))}
-    </div>
-  );
-});
+const ImgGalery = React.memo(
+  forwardRef((props: ImgGaleryProps, ref: any) => {
+    const { data, onChangeImage, openPopup, setIdCurPop } = props;
+    const handleEndScroll = useMemo(
+      () => _.debounce((id: number) => onChangeImage(id), 300),
+      [onChangeImage]
+    );
+    const handleScroll = (event: any) => {
+      const scrollLeft = event.currentTarget.scrollLeft;
+      const withElement = event.currentTarget.offsetWidth;
+      const id = Math.floor(scrollLeft / withElement);
+      handleEndScroll(id);
+    };
+    return (
+      <div
+        className={styles['img-galery-container']}
+        onScroll={handleScroll}
+        onClick={openPopup}
+      >
+        {data &&
+          data.map((d: any, i: number) => (
+            <img
+              className={styles['img-galery']}
+              key={i}
+              src={d}
+              alt={''}
+              ref={(e) => (ref.current[i] = e)}
+              onClick={() => {
+                setIdCurPop(i);
+              }}
+            />
+          ))}
+      </div>
+    );
+  })
+);
 interface ImgIndexCounterProps {
   length: number;
   idCur: number;
@@ -91,7 +76,7 @@ const ImgIndexCounter: FC<ImgIndexCounterProps> = (props) => {
     <div
       className={classNames(styles['img-id-counter'], classnames?.container)}
     >
-      <span>{idCur}/</span>
+      <span>{idCur + 1}/</span>
       <span>{length}</span>
     </div>
   );
@@ -103,9 +88,8 @@ interface ImgPopUpProps {
   closePopup: () => void;
   idCurPop: number;
   setIdCurPop: (par: number) => void;
-  onTouchStart: (par: any) => void;
-  onTouchMove: (par: any) => void;
-  onTouchEnd: (par: any) => void;
+  handleScrollIntoView: (par: number) => void;
+  // onTouchEnd: (par: any) => void;
 }
 const ImgPopUp = forwardRef((props: ImgPopUpProps, ref: any) => {
   const {
@@ -114,21 +98,29 @@ const ImgPopUp = forwardRef((props: ImgPopUpProps, ref: any) => {
     closePopup,
     idCurPop,
     setIdCurPop,
-    onTouchStart,
-    onTouchEnd,
-    onTouchMove,
+    handleScrollIntoView,
   } = props;
+  // const [lastScrollLeft, setLastScrollLeft] = useState<number>(0);
   const handleOnScroll = (e: any) => {
-    const clientWidth = e.currentTarget.clientWidth;
     const scrollLeft = e.currentTarget.scrollLeft;
-    const id = Math.floor(scrollLeft / clientWidth) + 1;
-    console.log('event', e);
-    // setIdCurPop(id);
+    const widthElement = e.target.clientWidth;
+    const id = Math.floor(scrollLeft / widthElement);
+    handleEndScroll(id);
   };
-  console.log('idCurPop', idCurPop);
+  const handleEndScroll = useMemo(
+    () => _.debounce((id: number) => setIdCurPop(id), 100),
+    [setIdCurPop]
+  );
   useEffect(() => {
-    ref.current[idCurPop].scrollIntoView({ behavior: 'smooth' });
-  }, [idCurPop, ref, setIdCurPop]);
+    handleScrollIntoView(idCurPop);
+    return () => {
+      handleScrollIntoView(0);
+    };
+  }, [handleScrollIntoView]);
+  // useEffect(() => {
+  //   handleScrollIntoView(0);
+  // }, []);
+  console.log(idCurPop);
   return (
     <div
       className={classNames(
@@ -139,24 +131,14 @@ const ImgPopUp = forwardRef((props: ImgPopUpProps, ref: any) => {
       <button className={styles['popup-btn-close']} onClick={closePopup}>
         X
       </button>
-      <div
-        className={styles['img-container']}
-        // onScroll={handleOnScroll}
-      >
+      <div className={styles['img-container']} onScroll={handleOnScroll}>
         {data.map((d: any, i: number) => (
           <div
             className={styles['img-wrapper']}
             key={i}
-            ref={(e) => (ref.current[i + 1] = e)}
+            ref={(e) => (ref.current[i] = e)}
           >
-            <img
-              className={styles['img-popup']}
-              src={d}
-              alt=""
-              onTouchStart={onTouchStart}
-              onTouchMove={onTouchMove}
-              onTouchEnd={onTouchEnd}
-            />
+            <img className={styles['img-popup']} src={d} alt="" />
           </div>
         ))}
       </div>
@@ -175,62 +157,53 @@ export interface UiImgGaleryMobileProps {
 
 export function UiImgGaleryMobile(props: UiImgGaleryMobileProps) {
   const { data = dataImgs } = props;
-  const [idCurrent, setIdCurrent] = useState<number>(1);
-  const [idCurPop, setIdCurPop] = useState<number>(1);
-  const [touchPosition, setTouchPosition] = useState(null);
-  const [upPosition, setUpPosition] = useState(null);
-  const [offSetLeftCur, setOffSetLeftCur] = useState<number>(0);
+  const [idCurrent, setIdCurrent] = useState<number>(0);
+  const [idCurPop, setIdCurPop] = useState<number>(0);
   const [isPopup, setIsPopup] = useState<boolean>(false);
+  // const [offSetLeftCur, setOffSetLeftCur] = useState<number>(0);
 
   const openPopup = () => {
     setIsPopup(true);
   };
   const closePopup = () => {
     setIsPopup(false);
+    setIdCurPop(0);
   };
   const onChangeImgGal = (id: number) => {
     setIdCurrent(id);
   };
-  // const onNext=()=>{
-  //   idCurPop ===
-  //   setIdCurPop(preId=> preId+1)
-  // }
-  const onSwipeNext = () => {
-    idCurrent < data.length
-      ? setIdCurrent((preId) => preId + 1)
-      : setIdCurPop(0);
-  };
-  const onSwipePre = () => {
-    idCurrent === 0
-      ? setIdCurPop(data.length)
-      : setIdCurrent((preId) => preId - 1);
-  };
+  // const onSwipeNext = () => {
+  //   if (idCurPop === data?.length) setIdCurPop(data?.length);
+  //   else if (idCurPop < data?.length) setIdCurPop((preId) => preId + 1);
+  // };
+  // const onSwipePre = () => {
+  //   if (idCurPop === 1) setIdCurPop(1);
+  //   else if (idCurPop > 0) setIdCurPop((preId) => preId - 1);
+  // };
 
-  const handleTouchStart = (e: any) => {
-    const touchDown = e.touches[0].clientX;
-    setTouchPosition(touchDown);
-  };
-  const handleTouchMove = (e: any) => {
-    const touchDown = touchPosition;
-    if (touchDown === null) {
-      return;
-    }
-    const currentTouch = e.changedTouches[0].clientX;
+  // const handleTouchMove = (e: any) => {
+  //   const touchDown = touchPosition;
+  //   if (touchDown === null) {
+  //     return;
+  //   }
+  //   const currentTouch = e.changedTouches[0].clientX;
 
-    const diff = touchDown - currentTouch;
-    console.log('diff', diff);
-    if (diff > 5) {
-      onSwipeNext();
-    } else if (diff < 5) {
-      onSwipePre();
-    }
+  //   const diff = touchDown - currentTouch;
+  //   console.log('diff', diff);
+  //   if (diff >= 8) {
+  //     onSwipeNext();
+  //   } else if (diff < 8) {
+  //     onSwipePre();
+  //   }
 
-    setTouchPosition(null);
-    setUpPosition(null);
-  };
-  const handleTouchEnd = (e: any) => {
-    const touchUp = e.changedTouches[0].clientX;
-    setUpPosition(touchUp);
+  //   setTouchPosition(null);
+  // };
+  // const handleTouchEnd = (e: any) => {
+  //   const touchUp = e.changedTouches[0].clientX;
+  //   setUpPosition(touchUp);
+  // };
+  const handleScrollIntoView = (id: number) => {
+    imgRefPopup.current[id].scrollIntoView({ behavior: 'smooth' });
   };
   const imgRef = useRef<any>([]);
   const imgRefPopup = useRef<any>([]);
@@ -240,8 +213,6 @@ export function UiImgGaleryMobile(props: UiImgGaleryMobileProps) {
         ref={imgRef}
         data={data}
         onChangeImage={onChangeImgGal}
-        offsetLeftCur={offSetLeftCur}
-        setOffsetLeftCur={setOffSetLeftCur}
         openPopup={openPopup}
         setIdCurPop={setIdCurPop}
       />
@@ -253,9 +224,7 @@ export function UiImgGaleryMobile(props: UiImgGaleryMobileProps) {
         closePopup={closePopup}
         idCurPop={idCurPop}
         setIdCurPop={setIdCurPop}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
+        handleScrollIntoView={handleScrollIntoView}
       />
     </div>
   );
