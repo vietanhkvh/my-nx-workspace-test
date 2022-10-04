@@ -16,6 +16,8 @@
     "baseUrl": ".",
     "paths": {
       "@my-nx-workspace/ui-antd": ["libs/ui-antd/src/index.ts"],
+      "@my-nx-workspace/ui-antd/desktop": ["libs/ui-antd/desktop/src/index.ts"],
+      "@my-nx-workspace/ui-antd/mobile": ["libs/ui-antd/mobile/src/index.ts"],
       "@my-nx-workspace/ui-slider": ["libs/ui-slider/src/index.ts"]
     }
   },

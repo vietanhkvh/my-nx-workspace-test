@@ -5,6 +5,8 @@
     "first-app": "apps/first-app",
     "first-app-e2e": "apps/first-app-e2e",
     "ui-antd": "libs/ui-antd",
+    "ui-antd-desktop": "libs/ui-antd/desktop",
+    "ui-antd-mobile": "libs/ui-antd/mobile",
     "ui-slider": "libs/ui-slider",
     "ui-slider-e2e": "apps/ui-slider-e2e"
   }
