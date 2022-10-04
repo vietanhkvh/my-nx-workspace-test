@@ -5,7 +5,6 @@
     "first-app": "apps/first-app",
     "first-app-e2e": "apps/first-app-e2e",
     "ui-slider": "libs/ui-slider",
-    "ui-slider-e2e": "apps/ui-slider-e2e",
     "ui-slider-multiple-items": "libs/ui-slider-multiple-items"
   }
 }
