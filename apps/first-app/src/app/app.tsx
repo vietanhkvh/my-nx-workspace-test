@@ -2,14 +2,30 @@
 import styles from './app.module.scss';
 import NxWelcome from './nx-welcome';
 import Swipes from 'libs/ui-antd/mobile/src/lib/swipes/swipes';
+import ImgViewer from 'libs/ui-antd/mobile/src/lib/img-viewer/img-viewer';
 import UiSlider from 'libs/ui-slider/src/lib/ui-slider';
 import { StarOutline, StarFill } from 'antd-mobile-icons';
+import { useState } from 'react';
 
 const indicatorCus = (total: number, current: number) =>
   [...Array(total)].map((a, i) =>
     i === current ? <StarFill /> : <StarOutline />
   );
+const demoImages = [
+  'https://images.unsplash.com/photo-1620476214170-1d8080f65cdb?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=250&q=80',
+  'https://images.unsplash.com/photo-1601128533718-374ffcca299b?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=250&q=80',
+  'https://images.unsplash.com/photo-1567945716310-4745a6b7844b?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=250&q=80',
+  'https://images.unsplash.com/photo-1624993590528-4ee743c9896e?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=250&h=250&q=80',
+];
+const itemsImg = (d: any) => <img src={d} alt={''} draggable={false} />;
 export function App() {
+  const [isPopup, setIsPopUp] = useState<boolean>(false);
+  const onClickSwiper = () => {
+    setIsPopUp(true);
+  };
+  const handlerOnClose = () => {
+    setIsPopUp(false);
+  };
   return (
     <>
       <UiSlider
@@ -72,7 +88,19 @@ export function App() {
         timeChange={2000}
         type={'dot'}
       />
-      <Swipes isAutoPlay={false} isLoop={true} indicator={indicatorCus} />
+      <Swipes
+        isAutoPlay={false}
+        isLoop={true}
+        indicator={indicatorCus}
+        dataInput={demoImages}
+        items={itemsImg}
+        onClick={onClickSwiper}
+      />
+      <ImgViewer
+        dataInput={demoImages}
+        handlerOnClose={handlerOnClose}
+        isVisible={isPopup}
+      />
     </>
   );
 }
