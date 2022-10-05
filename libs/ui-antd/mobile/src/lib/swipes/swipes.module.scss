@@ -9,3 +9,18 @@
     user-select: none;
   }
 }
+.border {
+  border-radius: 8px;
+}
+.customIndicatorNum {
+  position: absolute;
+  bottom: 15%;
+  right: 6px;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 4px 8px;
+  color: #ffffff;
+  border-radius: 4px;
+  user-select: none;
+}
+.customIndicator {
+}
