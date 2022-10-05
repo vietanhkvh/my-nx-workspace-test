@@ -1,8 +1,14 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import styles from './app.module.scss';
 import NxWelcome from './nx-welcome';
+import Swipes from 'libs/ui-antd/mobile/src/lib/swipes/swipes';
 import UiSlider from 'libs/ui-slider/src/lib/ui-slider';
+import { StarOutline, StarFill } from 'antd-mobile-icons';
 
+const indicatorCus = (total: number, current: number) =>
+  [...Array(total)].map((a, i) =>
+    i === current ? <StarFill /> : <StarOutline />
+  );
 export function App() {
   return (
     <>
@@ -66,6 +72,7 @@ export function App() {
         timeChange={2000}
         type={'dot'}
       />
+      <Swipes isAutoPlay={false} isLoop={true} indicator={indicatorCus} />
     </>
   );
 }

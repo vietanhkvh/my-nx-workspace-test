@@ -1,6 +1,7 @@
 import { ComponentStory, ComponentMeta } from '@storybook/react';
 import { Swipes } from './swipes';
 import styles from './swipes.module.scss';
+import { StarOutline, StarFill } from 'antd-mobile-icons';
 export default {
   component: Swipes,
   title: 'UiAntd/Swipes',
@@ -13,8 +14,13 @@ const indicatorNumber = (total: number, current: number) => (
   </div>
 );
 const indicatorCus = (total: number, current: number) => (
-  <div className={styles.customIndicator}></div>
+  <div className={styles.customIndicator}>
+    {[...Array(total)]
+      .fill(0)
+      .map((a, i) => (i === current ? <StarFill /> : <StarOutline />))}
+  </div>
 );
+
 export const Primary = Template.bind({});
 Primary.args = {};
 export const AutoPlay = Template.bind({});
@@ -35,7 +41,7 @@ IndicatorIndex.args = {
 };
 export const IndicatorDotCustom = Template.bind({});
 IndicatorDotCustom.args = {
-  isAutoPlay: true,
+  isAutoPlay: false,
   isLoop: true,
   indicator: indicatorCus,
 };
