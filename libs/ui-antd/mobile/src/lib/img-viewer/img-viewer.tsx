@@ -24,7 +24,7 @@ export function ImgViewer(props: ImgViewerProps) {
     defaultIndex,
   } = props;
   return (
-    <div className={styles['imgviewer-container']}>
+    <div className={styles['imgViewerContainer']}>
       {Array.isArray(dataInput) ? (
         <ImageViewer.Multi
           images={dataInput}

@@ -1,20 +1,7 @@
 import styles from './swipes.module.scss';
 import { Swiper, Toast } from 'antd-mobile';
-import { ReactNode } from 'react';
-const colors = ['#ace0ff', '#bcffdd', '#e4fabd', '#ffcfac'];
-const items = colors.map((c, i) => (
-  <Swiper.Item>
-    <div
-      className={styles['content']}
-      style={{ background: c }}
-      onClick={() => {
-        Toast.show(`image at index ${i + 1}`);
-      }}
-    >
-      {i + 1}
-    </div>
-  </Swiper.Item>
-));
+import { FC, ReactNode } from 'react';
+export const colors = ['#ace0ff', '#bcffdd', '#e4fabd', '#ffcfac'];
 /* eslint-disable-next-line */
 export interface SwipesProps {
   isAutoPlay?: boolean;
@@ -27,6 +14,9 @@ export interface SwipesProps {
   stuckAtBoundary?: boolean;
   indicator?: (total: number, current: number) => ReactNode;
   classnameIn?: string;
+  dataInput: any;
+  items: (par1?: any, par2?: any) => ReactNode;
+  onClick?: () => void;
 }
 
 export function Swipes(props: SwipesProps) {
@@ -40,7 +30,15 @@ export function Swipes(props: SwipesProps) {
     stuckAtBoundary = false,
     classnameIn = '',
     indicator,
+    dataInput,
+    items,
+    onClick,
   } = props;
+  const itemsMember = dataInput.map((d: any, i: number) => (
+    <Swiper.Item key={i} onClick={onClick}>
+      {items(d, i)}
+    </Swiper.Item>
+  ));
   return (
     <div className={styles['container']}>
       <Swiper
@@ -52,9 +50,8 @@ export function Swipes(props: SwipesProps) {
         slideSize={slideSide}
         stuckAtBoundary={stuckAtBoundary}
         indicator={indicator}
-        style={{ padding: '0 0 16px' }}
       >
-        {items}
+        {itemsMember}
       </Swiper>
     </div>
   );
