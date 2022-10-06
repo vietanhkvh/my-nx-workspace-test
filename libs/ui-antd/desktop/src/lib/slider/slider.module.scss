@@ -1,0 +1,26 @@
+/*
+ * Replace this with your own classes
+ *
+ * e.g.
+ * .
+*/
+.carouselContainer {
+  .items {
+    height: 160px;
+    color: #fff;
+    line-height: 160px;
+    text-align: center;
+    background: #367968;
+  }
+}
+.dot {
+  li {
+    width: 20px !important;
+    height: 20px !important;
+    button {
+      border-radius: 50% !important;
+      width: 100% !important;
+      height: 100% !important;
+    }
+  }
+}
