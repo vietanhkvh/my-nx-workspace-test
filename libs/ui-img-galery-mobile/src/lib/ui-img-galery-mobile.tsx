@@ -2,15 +2,7 @@
 import classNames from 'classnames';
 import _ from 'lodash';
 import React from 'react';
-import {
-  FC,
-  forwardRef,
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { FC, forwardRef, useEffect, useMemo, useRef, useState } from 'react';
 import styles from './ui-img-galery-mobile.module.scss';
 export const dataImgs = [
   'https://upload.lixibox.com/system/pictures/files/000/071/134/large/1648711146.jpg?v=4',
