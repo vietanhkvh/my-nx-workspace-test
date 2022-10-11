@@ -286,6 +286,7 @@ export function UiSliderMultipleItems(props: UiSliderMultipleItemsProps) {
   const [slideIndex, setSlideIndex] = useState<number>(0);
   const containerRef = useRef<any>();
   const sliderRef = useRef<any>([]);
+  const [isHidden, setHidden] = useState<boolean>(false);
   const onPause = () => {
     setPaused((prevState) => !prevState);
   };
@@ -344,6 +345,21 @@ export function UiSliderMultipleItems(props: UiSliderMultipleItemsProps) {
         typeDot={typeDot}
         setSliderIndex={changeSlideIndex}
       />
+      <button
+        className={styles['click']}
+        onClick={() => setHidden((pre) => !pre)}
+      >
+        click
+      </button>
+      <button
+        className={classNames(
+          styles['hidden'],
+          isHidden && styles['active-hidden']
+        )}
+        onClick={() => console.log('hidden btn')}
+      >
+        will hidden
+      </button>
     </div>
   );
 }

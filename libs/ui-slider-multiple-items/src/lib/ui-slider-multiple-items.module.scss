@@ -149,6 +149,35 @@
       }
     }
   }
+  .click {
+  }
+  .hidden {
+    height: auto;
+    opacity: 1;
+    transition: height 0ms 0ms, opacity 600ms 0ms;
+  }
+  .active-hidden {
+    overflow: hidden; /* Hide the element content, while height = 0 */
+    opacity: 0;
+    pointer-events: none;
+    transition: 0.3s all ease-out 0s;
+  }
+  @-webkit-keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
   // &:hover {
   //   .btn-container {
   //     visibility: visible;
