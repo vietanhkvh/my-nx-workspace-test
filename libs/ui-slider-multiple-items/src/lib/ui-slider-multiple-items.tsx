@@ -17,6 +17,14 @@ export const arrContent = [
     id: 3,
     src: 'https://cdn.shopify.com/s/files/1/0592/3369/7845/files/ORANGE_BANNER.jpg?v=1660529073&width=1100',
   },
+  {
+    id: 4,
+    src: 'https://cdn.shopify.com/s/files/1/0592/3369/7845/files/ONE_IN_A_MELON_BANNER.png?v=1660299007&width=1100',
+  },
+  {
+    id: 5,
+    src: 'https://cdn.shopify.com/s/files/1/0592/3369/7845/files/Halio_web.jpg?v=1660533507&width=1100',
+  },
 ];
 
 interface ContentContainerProps {
