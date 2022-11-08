@@ -1,6 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import classNames from 'classnames';
-import _ from 'lodash';
 import React from 'react';
 import { FC, forwardRef, useEffect, useMemo, useRef, useState } from 'react';
 import styles from './ui-img-galery-mobile.module.scss';
@@ -21,15 +20,16 @@ interface ImgGaleryProps {
 const ImgGalery = React.memo(
   forwardRef((props: ImgGaleryProps, ref: any) => {
     const { data, onChangeImage, openPopup, setIdCurPop } = props;
-    const handleEndScroll = useMemo(
-      () => _.debounce((id: number) => onChangeImage(id), 300),
-      [onChangeImage]
-    );
+    let timer: any = null;
+    const handleEndScroll = (id: number) => {
+      onChangeImage(id);
+    };
     const handleScroll = (event: any) => {
       const scrollLeft = event.currentTarget.scrollLeft;
       const withElement = event.currentTarget.offsetWidth;
       const id = Math.floor(scrollLeft / withElement);
-      handleEndScroll(id);
+      !!timer && clearTimeout(timer);
+      timer = setTimeout(() => handleEndScroll(id), 150);
     };
     return (
       <div
@@ -92,17 +92,18 @@ const ImgPopUp = forwardRef((props: ImgPopUpProps, ref: any) => {
     setIdCurPop,
     handleScrollIntoView,
   } = props;
-  // const [lastScrollLeft, setLastScrollLeft] = useState<number>(0);
+  // let timer: any = null;
+  const handleEndScroll = (id: number) => id !== idCurPop && setIdCurPop(id);
   const handleOnScroll = (e: any) => {
     const scrollLeft = e.currentTarget.scrollLeft;
     const widthElement = e.target.clientWidth;
     const id = Math.floor(scrollLeft / widthElement);
-    handleEndScroll(id);
+    // !!timer && clearTimeout(timer);
+    // timer = setTimeout(() => handleEndScroll(id), 150);
+
+    if (0 === scrollLeft % widthElement) handleEndScroll(id);
   };
-  const handleEndScroll = useMemo(
-    () => _.debounce((id: number) => setIdCurPop(id), 100),
-    [setIdCurPop]
-  );
+
   useEffect(() => {
     handleScrollIntoView(idCurPop);
     return () => {
